@@ -16,6 +16,9 @@ import string
 
 import pandas as pd
 import unicodedata
+from tqdm import tqdm
+
+tqdm.pandas()
 
 
 class Keyer(ABC):
@@ -177,12 +180,15 @@ class StringClustering(object):
         'NGramFingerPrint'
     ]
 
-    def __init__(self, series, method="StringFingerPrint"):
+    def __init__(self, series, method="StringFingerPrint", **kwargs):
         self.series = series
         self.original_name = 'original_strings'
         self.series.name = self.original_name
         self.method = method
         self._data = pd.DataFrame(series)
+        self._orphans = None
+        self._clusters = None
+        self.kwargs = kwargs
 
     @property
     def series(self):
@@ -196,7 +202,7 @@ class StringClustering(object):
 
     @property
     def method(self):
-        return self._method
+        return self._method.split('.')[0]
 
     @method.setter
     def method(self, method):
@@ -205,28 +211,63 @@ class StringClustering(object):
                              self.methods)
         self._method = method + ".key"
 
+    @property
+    def keys(self):
+        try:
+            self._data['key']
+        except KeyError:
+            self.compute_keys()
+        return self._data['key']
+
     def compute_keys(self):
         self._data['key'] = self._data[self.original_name]\
-        .apply(eval(self.method))
+        .apply(eval(self._method), **self.kwargs)
 
-    def get_orphan(self):
-        try:
-            keys = self._data['key']
-        except KeyError:
-            self.compute_keys()
-            keys = self._data['key']
-        count = keys.count()
-        orphans = count[count == 1]
-        return orphans
+    @property
+    def orphans(self):
+        if type(self._orphans) != pd.Series:
+            keys = self.keys
+            count = keys.value_counts()
+            self._orphans = count[count == 1]
+        return self._orphans
+
+    @property
+    def clusters(self):
+        if type(self._clusters) != pd.Series:
+            keys = self.keys
+            count = keys.value_counts()
+            self._clusters = count[count > 1]
+        return self._clusters
+
+    def get_cluster_name(self, key):
+        original_names = self._data[self.keys == key]
+        original_names = original_names[self.original_name].value_counts()
+        return original_names.idxmax()
+
+    def mapper(self):
+        mapp = dict()
+        for cluster in tqdm(self.clusters.index):
+            mapp[cluster] = self.get_cluster_name(cluster)
+        return lambda x : mapp[x]
+
+    def get_results(self):
+        self.clustering_result()
+        print("Create a mapper function this can take a while.")
+        mapper = self.mapper()
+        data = self._data.set_index(self._data['key'])
+        data.loc[self.orphans.index, "key"] = data.loc[self.orphans.index,
+                                                       self.original_name]
+        data.loc[self.clusters.index, "key"] =\
+        print("Replace fingerprint by original name.")
+        data.loc[self.clusters.index, "key"].progress_apply(mapper)
+        return data["key"]
 
     def clustering_result(self):
-        try:
-            keys = self._data['key']
-        except KeyError:
-            self.compute_keys()
-            keys = self._data['key']
-        n_class = keys.drop_duplicates().count()
-        original_n_class = self._data[self.original_name]\
-        .drop_duplicates().count()
-        print(f'Detected {n_class} classes with {self.method} '
-              f'Original dataset contains {original_n_class} classes')
+        origin_class = self._data[self.original_name].drop_duplicates().count()
+        n_clusters = self.clusters.count()
+        n_orphans = self.orphans.count()
+        n_classes = self.keys.drop_duplicates().count()
+        print(f'Detected {n_clusters} clusters with {self.method} \n',
+              f'Total classes detected {n_classes}.\n',
+              f'Original dataset contains {origin_class} classes\n',
+              f'There is {n_orphans} orphans.')
