@@ -5,60 +5,60 @@ All parsers needed for string treatment are stored in this file.
 """
 from abc import ABC, abstractclassmethod
 import re
-import warnings
 
 import unicodedata
 
-mapper = {"grammes" : "g",
-          "gramme" : "g",
-          "g e" : "g",
-          "gr" : "g",
-          "grs" : "g",
-          "g egoutte" : "g",
-          "g egouttes" : "g",
-          "g net" : "g",
-          "gr." : "g",
-          "gr" : "g",
-          "g net egoutte" : "g",
-          "g poids net egoutte" : "g",
-          "g minimum" : "g",
-          "ge" : "g",
-          "g poids net" : "g",
-          "g total" : "g",
-          "g poids net total" : "g",
-          "g." : "g",
-          "g ." : "g",
-          ".gr" : "g",
-          "gram" : 'g',
-          "gramm" : "g",
+
+mapper = {"grammes": "g",
+          "gramme": "g",
+          "g e": "g",
+          "gr": "g",
+          "grs": "g",
+          "g egoutte": "g",
+          "g egouttes": "g",
+          "g net": "g",
+          "gr.": "g",
+          "gr": "g",
+          "g net egoutte": "g",
+          "g poids net egoutte": "g",
+          "g minimum": "g",
+          "ge": "g",
+          "g poids net": "g",
+          "g total": "g",
+          "g poids net total": "g",
+          "g.": "g",
+          "g .": "g",
+          ".gr": "g",
+          "gram": 'g',
+          "gramm": "g",
           "g net total": "g",
-          "g e egoutte" : "g",
-          "g env." : "g",
-          "grams" : "g",
+          "g e egoutte": "g",
+          "g env.": "g",
+          "grams": "g",
           "g environ": "g",
-          "kg e" : "kg",
-          "kg." : "kg",
-          "kg environ" : "kg",
-          "kg egoutte" : "kg",
-          "kgs" : "kg",
-          "kilos" : "kg",
+          "kg e": "kg",
+          "kg.": "kg",
+          "kg environ": "kg",
+          "kg egoutte": "kg",
+          "kgs": "kg",
+          "kilos": "kg",
           "litres": "l",
-          "litre" : "l",
-          "liter" : "l",
-          "ls" : "l",
-          "l e" : "l",
-          "l." : "l",
-          "l.e" : "l",
-          "lt" : "l",
+          "litre": "l",
+          "liter": "l",
+          "ls": "l",
+          "l e": "l",
+          "l.": "l",
+          "l.e": "l",
+          "lt": "l",
           "cl e": "cl",
-          "cl." : "cl",
-          "cl e" : "cl",
-          "ml e" : "ml",
-          "ml." : "ml",
-          "ufs" : "oeufs",
+          "cl.": "cl",
+          "cl e": "cl",
+          "ml e": "ml",
+          "ml.": "ml",
           }
 
 NORMAL_UNITS = ['g', 'kg', 'l', 'ml', 'cl']
+
 
 class Parser(ABC):
     """AbstractParser.
@@ -120,6 +120,7 @@ class Parser(ABC):
         """Override this method to decide what to do with re.match"""
         pass
 
+
 class SimpleParser(Parser):
     """Extract the quantity as float and the unit as str.
 
@@ -147,9 +148,11 @@ class SimpleParser(Parser):
             unit = match.group(2)
         elif len(match.groups()) == 3:
             # ex 2 x 100 g
-            value = int(match.group(1)) * float(match.group(2).replace(',', '.'))
+            value = int(match.group(1)) * float(match.group(2).replace(',',
+                                                                       '.'))
             unit = match.group(3)
         return value, cls.ensure_std_unit(unit)
+
 
 class ComplexeParser(Parser):
     """Extract the quantity as float and the unit as str.
@@ -184,7 +187,7 @@ class ComplexeParser(Parser):
                     return groups[0]
                 else:
                     # different values for the same unit
-                    raise ValueError("Can't choose between the values.")
+                    raise ValueError("Can't choose between values.")
             else:
                 # different units
                 if groups[0][1] in NORMAL_UNITS:
@@ -194,7 +197,7 @@ class ComplexeParser(Parser):
                     # the second group use regular unit
                     return groups[1]
                 else:
-                    # No standard unit detected in both groups
+                    # no standard unit detected in both groups
                     raise ValueError('Unknown units')
 
     @classmethod
@@ -206,6 +209,7 @@ class ComplexeParser(Parser):
             except ValueError:
                 pass
         return cls.choose_group(groups)
+
 
 class UnitParser(object):
     """UnitParser
@@ -224,7 +228,7 @@ class UnitParser(object):
         except ValueError:
             try:
                 return cls.ensure_correct_unit(ComplexeParser.parse(text))
-            except:
+            except Exception:
                 return 'Unknown frmt'
 
     @classmethod
@@ -257,5 +261,6 @@ class UnitParser(object):
         string = string.encode('ascii', 'ignore')
         string = string.decode("utf-8")
         return string.strip().lower()
+
 
 __all__ = ['UnitParser']
