@@ -109,20 +109,61 @@ class RepartitionPlot(AbstractVisualization):
         data = self.data.copy()
         count = data[self.var].value_counts().sort_values(ascending=False)
         top_recurent = count.iloc[:self.max_class].index.values
-        # xlabel, ylabel = kwargs.pop('xlabel', ''), kwargs.pop('ylabel', '')
+        colors = kwargs.pop('colors', None)
+        xlabel, ylabel = kwargs.pop('xlabel', ''), kwargs.pop('ylabel', '')
+        xticks_rotation = kwargs.pop('xticks_rotation', 0)
+        orient = kwargs.pop('orient', 'h')
         def labelizer(x):
             return x if x in top_recurent else 'other'
+
         data[self.var] = data[self.var].apply(labelizer)
         data = data.groupby(['brands', 'nutriscore_grade'])\
         .size().reset_index()\
         .pivot(columns='brands', index='nutriscore_grade', values=0)
+        if kwargs.pop('frequency', False):
+            data = data / data.sum() * 100
         if not kwargs.pop('others_cat', True):
             data.drop('other', axis=1, inplace=True)
-        # plt.figure(figsize=kwargs.pop('figsize', (12, 8)))
-        # data.set_index(hue)\
-        # .reindex(data.set_index(hue).sum().sort_values().index, axis=1)\
-        # .T.plot(kind='bar', stacked=True)
-        return data
+
+        if kwargs.pop('sort', 'values') == 'labels':
+            sorted_labels = data.columns\
+            .sort_values(ascending=kwargs.pop('ascending', True)).values
+        else:
+            sorted_labels = data.sum()\
+            .sort_values(ascending=kwargs.pop('ascending', True)).index.values
+
+        data = data[sorted_labels] # sort columns
+        cumsum = data.cumsum()
+        labels = data.columns.values
+
+        plt.figure(figsize=kwargs.pop('figsize', (12, 8)))
+
+        for i, label in enumerate(data.index.values):
+            heights = data.loc[label]
+            color = colors[i] if colors else None
+            label_str = label.upper()
+            if i > 0:
+                if orient == 'h':
+                    plt.barh(labels, heights,
+                             left=cumsum.loc[data.index.values[i - 1]],
+                             color=color, label=label_str)
+                else:
+                    plt.bar(labels, heights,
+                            bottom=cumsum.loc[data.index.values[i - 1]],
+                            color=color, label=label_str)
+            else:
+                if orient == 'h':
+                    plt.barh(labels, heights,
+                             color=color, label=label_str)
+                else:
+                    plt.bar(labels, heights,
+                            color=color, label=label_str)
+
+        plt.xticks(rotation=xticks_rotation)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+
+        plt.legend()
 
     def plot(self, **kwargs):
         if self.plot_type == 'bar':
