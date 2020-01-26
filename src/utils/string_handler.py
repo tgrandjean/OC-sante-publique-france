@@ -11,7 +11,6 @@ https://github.com/OpenRefine/OpenRefine/blob/master/LICENSE.txt
 """
 
 from abc import ABC, abstractclassmethod
-import re
 import string
 
 import pandas as pd
@@ -46,8 +45,8 @@ class Keyer(ABC):
             'hello hehe this is a shitty example'
 
         """
-        s = s.strip() # first remove whitespace around the string
-        s = s.lower() # then lowercase it
+        s = s.strip()  # first remove whitespace around the string
+        s = s.lower()  # then lowercase it
         # then replace all punctuation and control chars by spaces
         # we need to keep spaces for now otherwise:
         # Carrefour,Carrefour-baby --> CarrefourCarrefourbaby instead of
@@ -138,7 +137,8 @@ class NGramFingerPrint(Keyer):
         ngram_size (int) : the size of n-grams (default: 2)
 
     Example:
-        >>>NGramFingerPrint.key('Hello this is a shitty example.', ngram_size=2)
+        >>>NGramFingerPrint.key('Hello this is a shitty example.',
+                                ngram_size=2)
         'amaselexhehiisitlelllompotplsashsithtttyxaye'
     """
 
@@ -221,7 +221,7 @@ class StringClustering(object):
 
     def compute_keys(self):
         self._data['key'] = self._data[self.original_name]\
-        .apply(eval(self._method), **self.kwargs)
+            .apply(eval(self._method), **self.kwargs)
 
     @property
     def orphans(self):
@@ -248,7 +248,7 @@ class StringClustering(object):
         mapp = dict()
         for cluster in tqdm(self.clusters.index):
             mapp[cluster] = self.get_cluster_name(cluster)
-        return lambda x : mapp[x]
+        return lambda x: mapp[x]
 
     def get_results(self):
         self.clustering_result()
@@ -257,9 +257,9 @@ class StringClustering(object):
         data = self._data.set_index(self._data['key'])
         data.loc[self.orphans.index, "key"] = data.loc[self.orphans.index,
                                                        self.original_name]
-        data.loc[self.clusters.index, "key"] =\
         print("Replace fingerprint by original name.")
-        data.loc[self.clusters.index, "key"].progress_apply(mapper)
+        data.loc[self.clusters.index, "key"] =\
+            data.loc[self.clusters.index, "key"].progress_apply(mapper)
         return data["key"]
 
     def clustering_result(self):
