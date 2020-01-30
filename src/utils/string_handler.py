@@ -182,13 +182,13 @@ class StringClustering(object):
 
     def __init__(self, series, method="StringFingerPrint", **kwargs):
         self.series = series
+        self.kwargs = kwargs
         self.original_name = 'original_strings'
         self.series.name = self.original_name
         self.method = method
         self._data = pd.DataFrame(series)
         self._orphans = None
         self._clusters = None
-        self.kwargs = kwargs
 
     @property
     def series(self):
@@ -209,6 +209,9 @@ class StringClustering(object):
         if method not in self.methods:
             raise ValueError("You must specify a method available in :\n",
                              self.methods)
+        if method == 'NGramFingerPrint' and not self.kwargs.get('ngram_size'):
+            print('ngram_size not specified. Using default value [2]')
+
         self._method = method + ".key"
 
     @property
@@ -260,6 +263,7 @@ class StringClustering(object):
         print("Replace fingerprint by original name.")
         data.loc[self.clusters.index, "key"] =\
             data.loc[self.clusters.index, "key"].progress_apply(mapper)
+        data.set_index(self.series.index, inplace=True, drop=True)
         return data["key"]
 
     def clustering_result(self):

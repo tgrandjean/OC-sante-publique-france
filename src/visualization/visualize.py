@@ -84,10 +84,7 @@ class RepartitionPlot(AbstractVisualization):
     def pie(self, **kwargs):
         val = self.data[self.var].value_counts().sort_index()
         plt.figure(figsize=kwargs.get('figsize', (5, 6)))
-        plt.pie(val,
-                labels=val.index.str.upper(),
-                colors=kwargs.get('colors'),
-                explode=kwargs.get('explode'))
+        plt.pie(val, labels=val.index.str.upper(), **kwargs)
         plt.axis('equal')
 
     def bar(self, **kwargs):
@@ -117,13 +114,16 @@ class RepartitionPlot(AbstractVisualization):
             return x if x in top_recurent else 'other'
 
         data[self.var] = data[self.var].apply(labelizer)
-        data = data.groupby(['brands', 'nutriscore_grade'])\
+        data = data.groupby([self.var, 'nutriscore_grade'])\
         .size().reset_index()\
-        .pivot(columns='brands', index='nutriscore_grade', values=0)
+        .pivot(columns=self.var, index='nutriscore_grade', values=0)
         if kwargs.pop('frequency', False):
             data = data / data.sum() * 100
         if not kwargs.pop('others_cat', True):
-            data.drop('other', axis=1, inplace=True)
+            try:
+                data.drop('other', axis=1, inplace=True)
+            except KeyError:
+                pass
 
         if kwargs.pop('sort', 'values') == 'labels':
             sorted_labels = data.columns\
