@@ -73,8 +73,8 @@ un magasin?
   Openfoodfacts et Yuka). Par conséquent les données sont régulièrement mal
   complétées ou erronées.
   La base de données est assez conséquente (2.2 Go), elle contient (à l'heure
-  actuelle\footnote{Novembre 2019}) 1 054 801\footnote{600 654 pour les pays francophones (France,
-  Suisse, Belgique et Luxembourg)} d'entrées et 177 colonnes.
+  actuelle\footnote{23 janvier 2020}) 1 120 752\footnote{626 672 pour les pays
+  francophones (France, Suisse, Belgique et Luxembourg)} d'entrées et 178 colonnes.
 
   \subsection{Contenu de la base de données}
 
@@ -97,23 +97,23 @@ un magasin?
     On peut regarder le taux de remplissage des champs de manière graphique à
     l'aide d'un graphique type matrice. (chaque valeur est alors représentée
     par un tiret (les colonnes noires sont alors totalement complètes et les
-    colonnes vides sont blanches.) Voir graphique \ref{completion_field}
+    colonnes vides sont blanches.) Voir graphique \ref{completness}
 
-    \begin{figure*}[b]
-      \includegraphics[width=\linewidth]{completness_part_1.png}
-      \includegraphics[width=\linewidth]{completness_part_2.png}
-      \caption{Taux de remplissage des variables. En haut les colonnes de 1 à 78
-      et en bas le reste des colonnes. Les colonnes vides ont été retirées}
-      \label{completion_field}
-    \end{figure*}
-
-    On peut regarder la distribution du nombre de champs complétés.
-    \begin{figure}[H]
-      \includegraphics[width=70mm]{nombre-de-champs-completes-dist.png}
-      \caption{Distribution du nombre de champs complétés.}
-      \label{distrib_completion}
+    \begin{figure}
+      \includegraphics[width=80mm]{completness.png}
+      \caption{Taux de remplissage des champs}
+      \label{completness}
     \end{figure}
-    On a au minimum 18 champs complétés et 97 champs complétés maximum.
+    \subsection{Champs contenant des valeurs textuelles}
+
+    Pour les champs contenant des valeurs textuelles, on traite les champs
+    par méthode de <<clustering>>. L'algorithme utilisé est l'algorithme
+    de <<Key collision>>.
+    (<<StringFingerPrint>> méthode par défaut
+    d'OpenRefine\footnote{Le module \Verb"src.utils.string_handler" contient
+    également le code nécessaire à une collision de clées par la méthode des
+    n-grams.})
+
 
 \section{Analyses univariées}
 
@@ -134,25 +134,116 @@ un magasin?
       \item Teneur en sel
     \end{itemize}
   \end{itemize}
+
+
   \subsection{Répartition du nutriscore}
   \begin{figure}[H]
-    \includegraphics[width=70mm]{nutriscore-repartition.png}
+    \includegraphics[width=70mm]{nutriscore_pie.png}
     \caption{Répartition du nutriscore des produits}
     \label{nutriscore_pie}
   \end{figure}
 
+  \subsection{Marques, groupes PNNS et catégories}
+  \begin{figure}[H]
+    \includegraphics[width=75mm]{brands_repartition.png}
+    \caption{Répartion des produits en fonction des marques}
+    \label{}
+  \end{figure}
+  \begin{figure}[H]
+    \includegraphics[width=75mm]{pnns_1_repartition.png}
+    \caption{Répartion des produits en fonction du groupe PNNS}
+    \label{}
+  \end{figure}
+
+  \subsection{Catégories}
+  voir \textsc{\bf{Figure \ref{wc_cat}}}
+  \begin{figure*}
+    \includegraphics[width=\linewidth]{wc_categories.png}
+    \caption{Les catégories présentent dans la base de données sous forme de
+    nuage de mot (wordcloud)}
+    \label{wc_cat}
+  \end{figure*}
+
   \subsection{Valeurs énergétiques des produits}
   \begin{figure}[H]
-    \includegraphics[width=75mm]{distribution_valeur_energetique.png}
+    \includegraphics[width=75mm]{energy_100g-dist.png}
     \caption{Distribution des valeurs énergétiques des produits dans la base
     de données.}
     \label{}
   \end{figure}
+
+  \subsection{Nutriments aux 100g}
+  \begin{figure}[H]
+    \includegraphics[width=75mm]{carbohydrates_100g-dist.png}
+    \caption{Distribution de la quantité de glucides aux 100g}
+    \label{}
+  \end{figure}
+
+  \begin{figure}[H]
+    \includegraphics[width=75mm]{fat_100g-dist.png}
+    \caption{Distribution de la quantité de graisse aux 100g}
+    \label{}
+  \end{figure}
+  \begin{figure}[H]
+    \includegraphics[width=75mm]{proteins_100g-dist.png}
+    \caption{Distribution de la quantité de protéines aux 100g}
+    \label{}
+  \end{figure}
+
+
 \section{Analyses multivariées}
 Toujours dans l'objectif de trouver un produit équivalent, il est important
 de vérifier que pour chaque catégorie (ici groupe Programme nutrition santé PNS)
 il existe des produits pour chaque nutriscore (de A à E).
 
+  \subsection{Nutriscore et marques}
+    \begin{figure}[H]
+      \includegraphics[width=75mm]{brands_nutscore_repartition.png}
+      \caption{Repartition du nutriscore au sein des marques}
+      \label{}
+    \end{figure}
+    \begin{figure}[H]
+      \includegraphics[width=75mm]{brands_nutscore_repartition_freq.png}
+      \caption{Repartition du nutriscore au sein des marques (normalisé en fréquence)}
+      \label{}
+    \end{figure}
+
+  \subsection{Nutriscore et groupes PNNS}
+  \begin{figure}[H]
+    \includegraphics[width=75mm]{pnns1_nutscore_repartition.png}
+    \caption{Repartition du nutriscore au sein des groupes PNNS}
+    \label{}
+  \end{figure}
+  \begin{figure}[H]
+    \includegraphics[width=75mm]{pnns1_nutscore_repartition_freq.png}
+    \caption{Repartition du nutriscore au sein des groupes PNNS (normalisé en fréquence)}
+    \label{}
+  \end{figure}
+
+  \begin{table}[H]
+    \footnotesize\setlength{\tabcolsep}{2.5pt}
+    \caption{Tableau de contingence groupe PNNS et Nutriscore}
+    \label{}
+    \input{contingency_tab.tex}
+  \end{table}
+
+  \subsection{Valeurs énergétiques des aliments et nutriscore}
+  \begin{figure}
+    \includegraphics[width=90mm]{box_plot_energy_nutscore.png}
+    \caption{}
+    \label{}
+  \end{figure}
+
+  \subsection{Nutriscore / valeurs énergétiques / composition des produits}
+
+
+  \begin{figure*}[h]
+    \includegraphics[width=\linewidth]{relational_plot.png}
+    \caption{}
+    \label{relplot}
+  \end{figure*}
+
+  voir \textsc{\bf{Figure \ref{relplot}}}
 \section{Conclusion}
 
 \section{Perspectives}
@@ -164,4 +255,5 @@ il existe des produits pour chaque nutriscore (de A à E).
 \begin{itemize}
   \item \faGithub \url{https://github.com/tgrandjean/OC-sante-publique-france}
   \item \faDatabase \url{https://world.openfoodfacts.org/data}
+  \item \faFileO \url{https://tgrandjean-oc-reports.s3.eu-west-3.amazonaws.com/openfoodfacts/profiling_report.html}
 \end{itemize}
