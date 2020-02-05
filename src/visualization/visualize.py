@@ -12,7 +12,7 @@ sns.set()
 
 class AbstractVisualization(ABC):
 
-    def __init__(self, data, font_size=16):
+    def __init__(self, data, font_size=18):
         plt.rcdefaults()
         font = {"size": font_size}
         sns.set()
@@ -52,7 +52,7 @@ class DistributionPlot(AbstractVisualization):
 
 class RepartitionPlot(AbstractVisualization):
 
-    available_types = ["bar", "pie", "stacked-bar"]
+    available_types = ["bar", "pie", "stacked-bar", "boxplot"]
 
     def __init__(self, data, var, plot_type, **kwargs):
         super().__init__(data)
@@ -75,11 +75,13 @@ class RepartitionPlot(AbstractVisualization):
     def data_for_plot(self):
         data = self.data[self.var].value_counts()
         data.sort_values()
-        x = data.iloc[:self.max_class].index.values
+        if self.max_class > data.shape[0]:
+            raise ValueError("Max class should be lower or equal to the number"
+                             " of categories available in the categ variable.")
+        x = data.index.values[:self.max_class]
         y = data.iloc[:self.max_class].values
         others = data.iloc[self.max_class:].sum()
-        return x, y, others
-
+        return list(x), list(y), others
 
     def pie(self, **kwargs):
         val = self.data[self.var].value_counts().sort_index()
@@ -165,6 +167,12 @@ class RepartitionPlot(AbstractVisualization):
 
         plt.legend()
 
+    def boxplot(self, **kwargs):
+        fig, ax = plt.subplots(1, figsize=kwargs.pop('figsize', (12, 8)))
+        sns.catplot(x=kwargs.pop('hue'), y=self.var,
+                    kind="box", data=self.data, ax=ax, **kwargs)
+        plt.close(2)
+
     def plot(self, **kwargs):
         if self.plot_type == 'bar':
             self.bar(**kwargs)
@@ -174,3 +182,6 @@ class RepartitionPlot(AbstractVisualization):
 
         elif self.plot_type == 'stacked-bar':
             return self.stacked_bar(kwargs.pop('hue', None), **kwargs)
+
+        elif self.plot_type == 'boxplot':
+            return self.boxplot(**kwargs)

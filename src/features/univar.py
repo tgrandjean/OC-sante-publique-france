@@ -21,7 +21,7 @@ class UnivariateAnalysis(object):
 
     def __init__(self, dataframe):
         plt.rcdefaults()
-        font = {'size'   : 16}
+        font = {'size': 18}
         sns.set()
         plt.rc('font', **font)
         self.data = dataframe
@@ -62,7 +62,7 @@ class UnivariateAnalysis(object):
 
         # Cut the window in 2 parts
         gridspec_kw = {"height_ratios": (.15, .85)}
-        f, (ax_box, ax_hist) = plt.subplots(2, sharex=True, figsize=(8, 8),
+        f, (ax_box, ax_hist) = plt.subplots(2, sharex=True, figsize=(5, 4),
                                             gridspec_kw=gridspec_kw)
 
         # Add a graph in each part
@@ -71,6 +71,7 @@ class UnivariateAnalysis(object):
 
         # Remove x axis name for the boxplot
         ax_box.set(xlabel='')
+        plt.tight_layout()
         if kwargs.get('save', False):
             filename = f"{column.replace(' ', '-')}-dist.png"
             filename = Keyer.asciify(filename)
