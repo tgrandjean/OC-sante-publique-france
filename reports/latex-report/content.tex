@@ -11,6 +11,9 @@
   nombre de maladies chroniques, parmi lesquelles le diabète, les maladie
   cardio-vasculaires et le cancer. \cite{OMS}
 
+  Pour endiguer ce mal, l'utilisation des nouvelles technologies à des fins
+  éducationnelles est une voie prometteuse.
+
   \subsection{Contexte}
 
   L'agence santé publique France a lancé un appel à projets pour trouver des
@@ -19,6 +22,9 @@
   permettant sur base des informations nutritionnelles de proposer des
   produits équivalents à ceux désirés par le consommateur mais avec de meilleurs
   propriétés nutritionnelles.
+
+  Dans un second temps, il sera envisable d'implémenter un moteur de recommandation
+  sur base des habitudes de consommation des utilisateurs de l'application.
 %------------------------------------------------
 
 \section{Objectifs}
@@ -32,7 +38,7 @@ que les données permettent bien de répondre à la problématique.
 \section{Problématique}
 
 La problématique est double :\newline
-La première chose est de s'assurer que les données dont on dispose contienent
+La première chose est de s'assurer que les données dont on dispose contiennent
 bien les informations nécessaires pour créer une telle application.\newline
 La deuxième chose :\newline
 Peut-on trouver dans la base de données, un produit équivalent avec
@@ -72,7 +78,7 @@ un magasin?
   Les données sont entrées par les utilisateurs (Applications mobiles :
   Openfoodfacts et Yuka). Par conséquent les données sont régulièrement mal
   complétées ou erronées.
-  La base de données est assez conséquente (2.2 Go), elle contient (à l'heure
+  La base de données pèse actuellement (2.2 Go), elle contient (à l'heure
   actuelle\footnote{23 janvier 2020}) 1 120 752\footnote{626 672 pour les pays
   francophones (France, Suisse, Belgique et Luxembourg)} d'entrées et 178 colonnes.
 
@@ -92,6 +98,24 @@ un magasin?
     On ne récupère que les données pour la France et les pays limitrophes
     francophones.
 
+    \subsection{Variables sélectionnées}
+    Pour assurer la faisabilité du projet, nous avons besoins de :
+    \begin{itemize}
+      \item Le nom du produit
+      \item Le code bar du produit
+      \item La marque du produit
+      \item La catégorie à la quelle appartient le produit
+      \item Le nutriscore (nutrition grade [A, ..., E])
+      \item Certaines données nutritionnelles :
+      \begin{itemize}
+        \item Valeur énergétique au 100g
+        \item Teneur en protéines
+        \item Teneur en sucres
+        \item Teneur en graisses
+        \item Teneur en sel
+      \end{itemize}
+    \end{itemize}
+
     \subsection{Taux de remplissage des champs}
 
     On peut regarder le taux de remplissage des champs de manière graphique à
@@ -99,41 +123,46 @@ un magasin?
     par un tiret (les colonnes noires sont alors totalement complètes et les
     colonnes vides sont blanches.) Voir graphique \ref{completness}
 
-    \begin{figure}
+    \begin{figure}[H]
       \includegraphics[width=80mm]{completness.png}
       \caption{Taux de remplissage des champs}
       \label{completness}
     \end{figure}
+
+      \subsubsection{Stratégie appliquée aux valeurs manquantes}
+
+      Pour les champs : \emph{quantité, nutriscore, catégorie, valeur énergétique}, on
+      supprime le produit si l'une des information est manquante.
+
+      Les champs \emph{marque, groupe PNNS 1 et 2}, on
+      remplace les valeurs manquantes par une catégorie inconnue \verb|unknown|
+
+
     \subsection{Champs contenant des valeurs textuelles}
 
-    Pour les champs contenant des valeurs textuelles, on traite les champs
-    par méthode de <<clustering>>. L'algorithme utilisé est l'algorithme
-    de <<Key collision>>.
-    (<<StringFingerPrint>> méthode par défaut
-    d'OpenRefine\footnote{Le module \Verb"src.utils.string_handler" contient
-    également le code nécessaire à une collision de clées par la méthode des
-    n-grams.})
+    Les champs <<PNNS groups>> <<Catégorie>> et <<Marques>> sont traités par
+    méthode de <<clustering>>. L'algorithme utilisé est l'algorithme de
+    <<Key collision>> méthode par défaut d'OpenRefine\cite{OpenRefine}.
+
+    Le champs quantité est traité grace à un parser.
+
+    \subsection{Champs numériques}
+
+    Les champs numériques représentant une quantité de nutriments au 100g (ex : protéines)
+    doivent être bornés dans l'interval $\mathbb{R}\in [0, 100]$
+
+    Le champs <<Valeur énergétique>> est borné dans l'interval $\mathbb{R}\in [0, 4000]$
+    \footnote{0 étant la valeur nutritionnelle de l'eau et l'élément le plus riche
+    est la graisse $\approx 3700$KJ}
+
+    Pour les champs correspondant à une sous classe d'un nutriment (ex : glucides et sucre)
+    on vérifie que le champs <<enfant>> est inférieur ou égal au champs <<parent>>
+
+    On vérifie en dernier lieu que la somme des valeurs protéines, graisse,
+    glucides, sel et fibres est inférieur à 100g
 
 
 \section{Analyses univariées}
-
-  \subsection{Variables sélectionnées}
-  Pour assurer la faisabilité du projet, nous avons besoins de :
-  \begin{itemize}
-    \item Le nom du produit
-    \item Le code bar du produit
-    \item La marque du produit
-    \item La catégorie à la quelle appartient le produit
-    \item Le nutriscore (nutrition grade [A, ..., E])
-    \item Certaines données nutritionnelles :
-    \begin{itemize}
-      \item Valeur énergétique au 100g
-      \item Teneur en protéines
-      \item Teneur en sucres
-      \item Teneur en graisses
-      \item Teneur en sel
-    \end{itemize}
-  \end{itemize}
 
 
   \subsection{Répartition du nutriscore}
@@ -142,6 +171,9 @@ un magasin?
     \caption{Répartition du nutriscore des produits}
     \label{nutriscore_pie}
   \end{figure}
+   On regarde ici la répartition des produits en fonction du nutriscore sous forme
+   d'un diagramme de type camembert. On observe une répartion relativement équitable
+   entre les différentes modalités. La classe D étant la plus présente et la B la moins présente.
 
   \subsection{Marques, groupes PNNS et catégories}
   \begin{figure}[H]
@@ -155,14 +187,19 @@ un magasin?
     \label{}
   \end{figure}
 
+  On observe qu'un grand nombre de produits n'ont pas de marque renseignée ("Unknow")
+  Le graphique montre les 10 modalités les plus représentées. Cependant, il y a
+  16 185 modalités présentent (dont 9572 orphelines)
+
   \subsection{Catégories}
-  voir \textsc{\bf{Figure \ref{wc_cat}}}
+  2107 modalités présentent dont 1754 orphelines. Voir \textsc{\bf{Figure \ref{wc_cat}}}
   \begin{figure*}
     \includegraphics[width=\linewidth]{wc_categories.png}
     \caption{Les catégories présentent dans la base de données sous forme de
     nuage de mot (wordcloud)}
     \label{wc_cat}
   \end{figure*}
+
 
   \subsection{Valeurs énergétiques des produits}
   \begin{figure}[H]
@@ -193,7 +230,7 @@ un magasin?
 
 \section{Analyses multivariées}
 Toujours dans l'objectif de trouver un produit équivalent, il est important
-de vérifier que pour chaque catégorie (ici groupe Programme nutrition santé PNS)
+de vérifier que pour chaque catégorie (ici groupe Programme national nutrition santé PNNS)
 il existe des produits pour chaque nutriscore (de A à E).
 
   \subsection{Nutriscore et marques}
@@ -244,7 +281,15 @@ il existe des produits pour chaque nutriscore (de A à E).
   \end{figure*}
 
   voir \textsc{\bf{Figure \ref{relplot}}}
-\section{Conclusion}
+\section{Conclusions}
+
+La base de données Openfoodfacts est une bonne base, cependant cette dernière
+demande un travail complexe de traitement. A l'heure actuelle, il est possible
+de rechercher des produits équivalents au sein du même groupe PNNS 1, d'affiner
+(dégrossir) la recherche sur base du groupe PNNS 2 et finalement affiner les
+résultats sur base de la catégorie.
+
+Prenons un exemple simple, l'utilisateur scan un steack haché au rayon boucherie,
 
 \section{Perspectives}
 
