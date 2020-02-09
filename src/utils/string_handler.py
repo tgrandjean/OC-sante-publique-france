@@ -281,8 +281,8 @@ class StringClustering(object):
     def get_cluster_name(self, key):
         """get_cluster_name, return the name of a cluster.
 
-        When we have some key collisions, we need to determine the correct name.
-        To determine which name is the correct one, we select all data
+        When we have some key collisions, we need to determine the correct
+        name. To determine which name is the correct one, we select all data
         corresponding to a cluster and we search the most recurent original
         name. We made the following assuption the greater is the better choice!
 

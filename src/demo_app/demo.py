@@ -6,7 +6,6 @@
 from pathlib import Path
 
 import streamlit as st
-import pandas as pd
 
 from src.demo_app.app_assets import load_data, display_product
 
@@ -40,8 +39,10 @@ display_product(product_infos.to_dict())
 
 
 st.title('Résultats de la recherche')
-related_products = data[data['pnns_groups_2'] == product_infos['pnns_groups_2']]
-related_products = related_products[related_products['main_category_en'] == product_infos.main_category_en]
+related_products = data[data['pnns_groups_2'] ==
+                        product_infos['pnns_groups_2']]
+related_products = related_products[related_products['main_category_en'] ==
+                                    product_infos.main_category_en]
 
 related_products.sort_values('nutriscore_grade', ascending=True, inplace=True)
 

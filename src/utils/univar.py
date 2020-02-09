@@ -16,6 +16,7 @@ from tabulate import tabulate
 
 from src.utils.string_handler import Keyer
 
+
 class UnivariateAnalysis(object):
     """UnivariateAnalysis."""
 
@@ -38,8 +39,8 @@ class UnivariateAnalysis(object):
 
     def completion_rate(self, column):
         """return completion rate for a column."""
-        complete = self.data[column].dropna().shape[0] \
-        / self.data[column].shape[0] * 100
+        complete = self.data[column].dropna().shape[0] /\
+            self.data[column].shape[0] * 100
         return f"completion rate -- {column} : {complete} %"
 
     def series_stats(self, column):
@@ -58,7 +59,7 @@ class UnivariateAnalysis(object):
         """Make a plot for a series."""
         if self.data[column].count() != self.data[column].shape[0]:
             warnings.warn('NaN detected in the series.'
-            ' NaNs are not considered for calculation.')
+                          ' NaNs are not considered for calculation.')
 
         # Cut the window in 2 parts
         gridspec_kw = {"height_ratios": (.15, .85)}
@@ -87,18 +88,15 @@ class UnivariateAnalysis(object):
         print(self.completion_rate(column))
         tab = tabulate(self.series_stats(column), tablefmt="html")
         display(HTML(tab))
-        #upper, lower = self.outliers_infos(column)
-        #display(lower)
-        #display(upper)
         self.graph_series(column, **kwargs)
 
     def outliers_infos(self, column):
         """Return informations for values out of range of 1st quantile
         and the 3rd."""
-        lower = self.data[self.data[column] <\
-         self.data[column].quantile(0.25)].copy()
-        upper = self.data[self.data[column] >\
-         self.data[column].quantile(0.75)].copy()
+        lower = self.data[self.data[column] <
+                          self.data[column].quantile(0.25)].copy()
+        upper = self.data[self.data[column] >
+                          self.data[column].quantile(0.75)].copy()
         lower_grp = lower.groupby('main_category_en').count()
         upper_grp = upper.groupby('main_category_en').count()
         sort_kwgrs = dict(by=f'{column}_mean', ascending=False)

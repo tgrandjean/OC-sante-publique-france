@@ -10,6 +10,7 @@ import seaborn as sns
 
 sns.set()
 
+
 class AbstractVisualization(ABC):
 
     def __init__(self, data, font_size=18):
@@ -95,8 +96,10 @@ class RepartitionPlot(AbstractVisualization):
         if kwargs.pop('others_cat', True):
             x = np.append(x, ['others'])
             y = np.append(y, [others])
+
         if kwargs.get('orient', 'v') == 'h':
             x, y = y, x
+
         xticks_rotation = kwargs.pop('xticks_rotation', 0)
         plt.figure(figsize=kwargs.pop('figsize', (12, 8)))
         sns.barplot(x=x, y=y, **kwargs)
@@ -112,15 +115,18 @@ class RepartitionPlot(AbstractVisualization):
         xlabel, ylabel = kwargs.pop('xlabel', ''), kwargs.pop('ylabel', '')
         xticks_rotation = kwargs.pop('xticks_rotation', 0)
         orient = kwargs.pop('orient', 'h')
+
         def labelizer(x):
             return x if x in top_recurent else 'other'
 
         data[self.var] = data[self.var].apply(labelizer)
         data = data.groupby([self.var, 'nutriscore_grade'])\
-        .size().reset_index()\
-        .pivot(columns=self.var, index='nutriscore_grade', values=0)
+            .size().reset_index()\
+            .pivot(columns=self.var, index='nutriscore_grade', values=0)
+
         if kwargs.pop('frequency', False):
             data = data / data.sum() * 100
+
         if not kwargs.pop('others_cat', True):
             try:
                 data.drop('other', axis=1, inplace=True)
@@ -129,12 +135,14 @@ class RepartitionPlot(AbstractVisualization):
 
         if kwargs.pop('sort', 'values') == 'labels':
             sorted_labels = data.columns\
-            .sort_values(ascending=kwargs.pop('ascending', True)).values
+                            .sort_values(
+                                ascending=kwargs.pop('ascending', True)).values
         else:
             sorted_labels = data.sum()\
-            .sort_values(ascending=kwargs.pop('ascending', True)).index.values
+                .sort_values(
+                    ascending=kwargs.pop('ascending', True)).index.values
 
-        data = data[sorted_labels] # sort columns
+        data = data[sorted_labels]  # sort columns
         cumsum = data.cumsum()
         labels = data.columns.values
 

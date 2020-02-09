@@ -1,5 +1,4 @@
 import io
-import os
 from pathlib import Path
 import warnings
 
@@ -54,7 +53,8 @@ def display_product(product_infos):
     """
     st.header(product_infos.get('product_name'))
     st.image(get_image(product_infos.get('image_url')))
-    st.markdown(f'**Nutriscore** {product_infos.get("nutriscore_grade").upper()}')
+    st.markdown(f'**Nutriscore** \
+                {product_infos.get("nutriscore_grade").upper()}')
     display_infos(product_infos)
 
 
@@ -96,16 +96,16 @@ def display_infos(product_infos):
     salt = product_infos.get('salt_100g')
     sodium = product_infos.get('sodium_100g')
 
-    st.write(pd.DataFrame({'Pour 100g' : [fat, saturated_fat,
-                                          proteins,
-                                          carbohydrates, sugars,
-                                          fibers,
-                                          salt, sodium]},
-                            index=['Matière grasse',
-                                   'dont saturée',
-                                    'protéines',
-                                    'glucides',
-                                    'dont sucre',
-                                    'fibres',
-                                    'sels',
-                                    'dont sodium']))
+    st.write(pd.DataFrame({'Pour 100g': [fat, saturated_fat,
+                                         proteins,
+                                         carbohydrates, sugars,
+                                         fibers,
+                                         salt, sodium]},
+                          index=['Matière grasse',
+                                 'dont saturée',
+                                 'protéines',
+                                 'glucides',
+                                 'dont sucre',
+                                 'fibres',
+                                 'sels',
+                                 'dont sodium']))

@@ -111,7 +111,7 @@ class Parser(ABC):
         :returns:
             unit (str) : standard unit or raw unit otherwise.
         :usage:
-            >>> ensure_std_unit('grammes')
+            >>> Parser.ensure_std_unit('grammes')
                 'g'
         """
         unit = unit.strip()
@@ -253,7 +253,7 @@ class UnitParser(object):
         """Remove non ascii characters in a string.
 
         :usage:
-            >>> normalize_string("éèàâêîôûç")
+            >>> UnitParser.normalize_string("éèàâêîôûç")
                 'eeaaeiouc'
         """
         string = unicodedata.normalize('NFD', string)

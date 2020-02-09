@@ -10,6 +10,7 @@ from pathlib import Path
 
 from src.data.data_downloader import DataDownloader
 
+
 @click.command()
 @click.argument('input_filepath', type=click.Path())
 @click.option('-f', '--format', type=click.Choice(['csv', 'mongodb']),

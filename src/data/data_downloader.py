@@ -42,12 +42,12 @@ class DataDownloader(object):
             self.container_name = kwargs.get('container_name')
             if not self.container_name:
                 self.container_name = 'openfoodfacts'
-            self.dump_location =  os.path.join(data_path, 'dump')
+            self.dump_location = os.path.join(data_path, 'dump')
 
     @property
     def _headers(self):
         """Return a dict with options for requests's headers."""
-        return {"User-Agent": "Mozilla/5.0",'Accept-Encoding' : None}
+        return {"User-Agent": "Mozilla/5.0", 'Accept-Encoding': None}
 
     def init_data_dir(self):
         """Initialize empty directories for data."""
@@ -112,8 +112,8 @@ class DataDownloader(object):
         --name {self.container_name} mongo'
         logging.info('Executing : %s', cmd)
         with subprocess.Popen(cmd, shell=True,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE) as proc:
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE) as proc:
             for line in iter(proc.stdout.readline, b''):
                 logger.info(line.decode('ascii'))
             for line in iter(proc.stderr.readline, b''):
