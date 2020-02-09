@@ -1,9 +1,9 @@
-.. sante_publique_france documentation master file, created by
+.. sante publique france documentation master file, created by
    sphinx-quickstart.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-sante_publique_france documentation!
+sante publique france documentation!
 ==============================================
 
 Contents:
@@ -13,6 +13,7 @@ Contents:
 
    getting-started
    commands
+   src
 
 
 

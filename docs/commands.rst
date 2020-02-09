@@ -1,10 +1,26 @@
-Commands
-========
+Commandes
+==========
 
-The Makefile contains the central entry points for common tasks related to this project.
+Le fichier Makefile contient des commandes pour le projet. (Testé uniquement sous Linux)
 
-Syncing data to S3
-^^^^^^^^^^^^^^^^^^
+Make requirements
+^^^^^^^^^^^^^^^^^
 
-* `make sync_data_to_s3` will use `aws s3 sync` to recursively sync files in `data/` up to `s3://[OPTIONAL] your-bucket-for-syncing-data (do not include 's3://')/data/`.
-* `make sync_data_from_s3` will use `aws s3 sync` to recursively sync files from `s3://[OPTIONAL] your-bucket-for-syncing-data (do not include 's3://')/data/` to `data/`.
+Permet d'installer les dépendances du projet.
+
+
+Make data
+^^^^^^^^^^
+
+Télécharge les données au format CSV depuis le site d'Openfoodfacts. Les données
+se trouvent alors dans le répertoire data/raw
+
+Make clean
+^^^^^^^^^^^
+
+Supprime tout les fichiers python compilés (.pyc)
+
+Make lint
+^^^^^^^^^^
+
+Vérifie la structure visuelle du code
