@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """parsers.
 
 All parsers needed for string treatment are stored in this file.
@@ -89,11 +90,11 @@ class Parser(ABC):
     def parse(cls, string):
         """execute action on the regex match.
 
-        :args::
+        :args:
             string (str) : string that you want extract data.
-        :returns::
+        :returns:
             cls.action : execute action method if there is a match.
-        :raise::
+        :raise:
             ValueError if no match detected.
         """
         try:
@@ -104,13 +105,14 @@ class Parser(ABC):
     @classmethod
     def ensure_std_unit(cls, unit):
         """use this method to standardize extracted units.
-        :args::
+
+        :args:
             unit (str) : raw extracted unit.
-        :returns::
+        :returns:
             unit (str) : standard unit or raw unit otherwise.
-        :example::
-            >>>ensure_std_unit('grammes')
-            'g'
+        :usage:
+            >>> ensure_std_unit('grammes')
+                'g'
         """
         unit = unit.strip()
         return unit if not mapper.get(unit) else mapper.get(unit)
@@ -124,17 +126,14 @@ class Parser(ABC):
 class SimpleParser(Parser):
     """Extract the quantity as float and the unit as str.
 
-    :example::
-        >>>SimpleParser.parse('100g')
-        (100.0, 'g')
-        >>>SimpleParser.parse('2x100g')
-        (200.0, 'g')
-        >>>SimpleParser.parse('hello')
-        -----------------------------------------------------------------------
-        ValueError                            Traceback (most recent call last)
-        ...
-
-        ValueError: Unknown format
+    :usage:
+        >>> SimpleParser.parse('100g')
+            (100.0, 'g')
+        >>> SimpleParser.parse('2x100g')
+            (200.0, 'g')
+        >>> SimpleParser.parse('hello')
+             ValueError                       Traceback (most recent call last)
+             ...
     """
 
     formats = [re.compile(r'^(\d+[,\.]?\d*)[\s*]?([a-z\s\.]+)$'),
@@ -157,9 +156,9 @@ class SimpleParser(Parser):
 class ComplexeParser(Parser):
     """Extract the quantity as float and the unit as str.
 
-    :example::
-        >>>ComplexeParser.parse('100 g (2 x 50g)')
-        (100, 'g')
+    :usage:
+        >>> ComplexeParser.parse('100 g (2 x 50g)')
+            (100, 'g')
     """
     formats = [re.compile(r'^(.+)\s*\((.+)\)$'),
                re.compile(r'^(.*),(.*)$')]
@@ -216,9 +215,9 @@ class UnitParser(object):
 
     wrapper for quantity and unit treatment.
 
-    :example::
-        >>>UnitParser.parse('100g')
-        (100, 'g')
+    :usage:
+        >>> UnitParser.parse('100g')
+            (100, 'g')
     """
 
     @classmethod
@@ -235,13 +234,13 @@ class UnitParser(object):
     def ensure_correct_unit(cls, qty_tuple):
         """Check  if the returned unit is a normal unit for food or drink.
 
-        :args::
+        :args:
             qty_tuple (tuple) : tuple contening the quantity (float)
                                 and unit (str)
-        :return::
+        :return:
             qty_tuple (tuple) : same as input
 
-        :raise::
+        :raise:
             ValueError if unit not in the NORMAL_UNITS.
         """
         if qty_tuple[1] not in NORMAL_UNITS:
@@ -253,9 +252,9 @@ class UnitParser(object):
     def normalize_string(cls, string):
         """Remove non ascii characters in a string.
 
-        :example::
-            >>>normalize_string("éèàâêîôûç")
-            'eeaaeiouc'
+        :usage:
+            >>> normalize_string("éèàâêîôûç")
+                'eeaaeiouc'
         """
         string = unicodedata.normalize('NFD', string)
         string = string.encode('ascii', 'ignore')
@@ -263,4 +262,4 @@ class UnitParser(object):
         return string.strip().lower()
 
 
-__all__ = ['UnitParser']
+# __all__ = ['UnitParser']

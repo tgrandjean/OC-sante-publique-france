@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """string_handler.
 
 Adapted from https://github.com/OpenRefine/OpenRefine/wiki/Clustering-In-Depth
@@ -20,8 +21,8 @@ from tqdm import tqdm
 tqdm.pandas()
 
 
-class Keyer(ABC):
-    """Keyer abstract class.
+class AbstractKeyer(ABC):
+    """AbstractKeyer class.
 
     Parent class for fingerprint needed for "collision methods"
 
@@ -33,16 +34,16 @@ class Keyer(ABC):
 
         Strip, lowerise and remove punctuation in a string.
 
-        Args:
+        :args:
             s (str) : string to process
 
-        Return:
+        :return:
             s (str) : processed string
 
-        Example:
-            s = "   Hello ! Héhé this is    a shitty example !!!"
-            >>>Keyer.preprocess_string(s)
-            'hello hehe this is a shitty example'
+        :usage:
+            >>> s = "   Hello ! Héhé this is    a shitty example !!!"
+            >>> AbstractKeyer.preprocess_string(s)
+                'hello hehe this is a shitty example'
 
         """
         s = s.strip()  # first remove whitespace around the string
@@ -73,15 +74,15 @@ class Keyer(ABC):
     def asciify(cls, s):
         """Replace all no ascii characters in a string.
 
-        Args:
+        :args:
             s (str) : string to process
 
-        Return:
+        :return:
             s (str) : processed string
 
-        Example:
-            >>>Keyer.asciify("é")
-            'e'
+        :usage:
+            >>> AbstractKeyer.asciify("é")
+                'e'
         """
         s = unicodedata.normalize('NFD', s)
         s = s.encode('ascii', 'ignore')
@@ -90,21 +91,26 @@ class Keyer(ABC):
 
     @abstractclassmethod
     def key(cls, s):
-        """Override this class method."""
+        """Override this class method.
+
+        The key method take only one argument: a string.
+        """
         msg = 'This method should be overriden in child class'
         raise NotImplementedError(msg)
 
 
-class StringFingerPrint(Keyer):
+class StringFingerPrint(AbstractKeyer):
     """Get finger print of a string.
+
+    Inherited class from AbstractKeyer
 
     create a fingerprint of a string: after preprocessing, we split on
     whitespaces then we sort fragments of the string and then we join all
     fragments back together with whitespaces between each fragments.
 
-    Example:
-        >>>StringFingerPrint.key('Hello this is a shitty example.')
-        'a example hello is shitty this'
+    :usage:
+        >>> StringFingerPrint.key('Hello this is a shitty example.')
+            'a example hello is shitty this'
     """
 
     @classmethod
@@ -124,22 +130,24 @@ class StringFingerPrint(Keyer):
         return s.strip()
 
 
-class NGramFingerPrint(Keyer):
+class NGramFingerPrint(AbstractKeyer):
     """Get NGram finger print from a string.
+
+    Inherited class from AbstractKeyer
 
     create a fingerprint of a string: after preprocessing, we remove all
     whitespaces and we create a list of n-grams of the string. Once we have
     all n-grams from the string, we sort them and then we join them back
     together.
 
-    Args:
+    :args:
         s (str) : the string that you want a fingerprint.
         ngram_size (int) : the size of n-grams (default: 2)
 
-    Example:
-        >>>NGramFingerPrint.key('Hello this is a shitty example.',
-                                ngram_size=2)
-        'amaselexhehiisitlelllompotplsashsithtttyxaye'
+    :usage:
+        >>> NGramFingerPrint.key('Hello this is a shitty example.',
+        >>>                       ngram_size=2)
+            'amaselexhehiisitlelllompotplsashsithtttyxaye'
     """
 
     @classmethod
@@ -162,7 +170,7 @@ class NGramFingerPrint(Keyer):
     def ngram_split(cls, s, ngram_size):
         """ngram_split : yield all ngrams from a string.
 
-        Args:
+        :args:
         """
         for i in range(len(s) - ngram_size + 1):
             yield s[i:i + ngram_size]
@@ -172,6 +180,29 @@ class StringClustering(object):
     """StringClustering.
 
     Create cluster of string following different methods.
+
+    :args:
+        series (pd.Series) : pandas series contening strings to process
+
+    :usage:
+        >>> data = pd.Series(['Abc', 'Abc', 'Aabc'])
+        >>> clusters = StringClustering(data,
+                                        method='NGramFingerPrint',
+                                        ngram_size=1)
+        >>> clusters.get_results()
+        Detected 1 clusters with NGramFingerPrint
+         Total classes detected 1.
+         Original dataset contains 2 classes
+         There is 0 orphans.
+        Create a mapper function this can take a while.
+        100%|███████████████████████████████████| 1/1 [00:00<00:00, 329.25it/s]
+        Replace fingerprint by original name.
+        100%|██████████████████████████████████| 3/3 [00:00<00:00, 3711.77it/s]
+        0    Abc
+        1    Abc
+        2    Abc
+
+        Name: key, dtype: object
 
     """
 
@@ -223,6 +254,11 @@ class StringClustering(object):
         return self._data['key']
 
     def compute_keys(self):
+        """Compute keys.
+
+        we apply the selected method on original data to get a new column
+        contening keys.
+        """
         self._data['key'] = self._data[self.original_name]\
             .apply(eval(self._method), **self.kwargs)
 
@@ -243,17 +279,49 @@ class StringClustering(object):
         return self._clusters
 
     def get_cluster_name(self, key):
+        """get_cluster_name, return the name of a cluster.
+
+        When we have some key collisions, we need to determine the correct name.
+        To determine which name is the correct one, we select all data
+        corresponding to a cluster and we search the most recurent original
+        name. We made the following assuption the greater is the better choice!
+
+        :example:
+            >>> data = pd.Series(['Abc', 'Abc', 'Aabc'])
+            >>> clusters = StringClustering(data,
+                                            method='NGramFingerPrint',
+                                            ngram_size=1)
+            >>> clusters.get_cluster_name('Abc')
+                'Abc'
+        """
         original_names = self._data[self.keys == key]
         original_names = original_names[self.original_name].value_counts()
         return original_names.idxmax()
 
     def mapper(self):
+        """mapper, return a mapper function to replace wrong categories."""
         mapp = dict()
         for cluster in tqdm(self.clusters.index):
             mapp[cluster] = self.get_cluster_name(cluster)
         return lambda x: mapp[x]
 
+    def clustering_result(self):
+        origin_class = self._data[self.original_name].drop_duplicates().count()
+        n_clusters = self.clusters.count()
+        n_orphans = self.orphans.count()
+        n_classes = self.keys.drop_duplicates().count()
+        print(f'Detected {n_clusters} clusters with {self.method} \n',
+              f'Total classes detected {n_classes}.\n',
+              f'Original dataset contains {origin_class} classes\n',
+              f'There is {n_orphans} orphans.')
+
     def get_results(self):
+        """Results of the clustering.
+
+        This is the top level API. Normally this should be the only method
+        to use.
+
+        """
         self.clustering_result()
         print("Create a mapper function this can take a while.")
         mapper = self.mapper()
@@ -265,13 +333,3 @@ class StringClustering(object):
             data.loc[self.clusters.index, "key"].progress_apply(mapper)
         data.set_index(self.series.index, inplace=True, drop=True)
         return data["key"]
-
-    def clustering_result(self):
-        origin_class = self._data[self.original_name].drop_duplicates().count()
-        n_clusters = self.clusters.count()
-        n_orphans = self.orphans.count()
-        n_classes = self.keys.drop_duplicates().count()
-        print(f'Detected {n_clusters} clusters with {self.method} \n',
-              f'Total classes detected {n_classes}.\n',
-              f'Original dataset contains {origin_class} classes\n',
-              f'There is {n_orphans} orphans.')
