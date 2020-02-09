@@ -89,31 +89,3 @@ class UnivariateAnalysis(object):
         tab = tabulate(self.series_stats(column), tablefmt="html")
         display(HTML(tab))
         self.graph_series(column, **kwargs)
-
-    def outliers_infos(self, column):
-        """Return informations for values out of range of 1st quantile
-        and the 3rd."""
-        lower = self.data[self.data[column] <
-                          self.data[column].quantile(0.25)].copy()
-        upper = self.data[self.data[column] >
-                          self.data[column].quantile(0.75)].copy()
-        lower_grp = lower.groupby('main_category_en').count()
-        upper_grp = upper.groupby('main_category_en').count()
-        sort_kwgrs = dict(by=f'{column}_mean', ascending=False)
-        cols = ['product_name', column]
-        means_low = lower.groupby('main_category_en')[column].mean()
-        means_upp = upper.groupby('main_category_en')[column].mean()
-        means_low.dropna(inplace=True)
-        means_upp.dropna(inplace=True)
-        means_low.name = column + '_mean'
-        means_upp.name = column + '_mean'
-        means_low = means_low.reset_index()
-        means_upp = means_upp.reset_index()
-        lower_grp = lower_grp[lower_grp['product_name'] != 0]
-        upper_grp = upper_grp[upper_grp['product_name'] != 0]
-        lower_grp = lower_grp[cols]
-        upper_grp = upper_grp[cols]
-        lower_grp.reset_index(inplace=True, drop=False)
-        upper_grp.reset_index(inplace=True, drop=False)
-        return (pd.merge(lower_grp, means_low).sort_values(**sort_kwgrs),
-                pd.merge(upper_grp, means_upp).sort_values(**sort_kwgrs))
