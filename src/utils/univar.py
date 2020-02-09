@@ -14,7 +14,7 @@ import pandas as pd
 import seaborn as sns
 from tabulate import tabulate
 
-from src.utils.string_handler import Keyer
+from src.utils.string_handler import AbstractKeyer
 
 
 class UnivariateAnalysis(object):
@@ -75,7 +75,7 @@ class UnivariateAnalysis(object):
         plt.tight_layout()
         if kwargs.get('save', False):
             filename = f"{column.replace(' ', '-')}-dist.png"
-            filename = Keyer.asciify(filename)
+            filename = AbstractKeyer.asciify(filename)
             output_filepath = kwargs.get('save_loc',
                                          "../reports/figures/")
             output_filepath = os.path.join(output_filepath, filename)
