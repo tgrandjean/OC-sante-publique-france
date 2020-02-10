@@ -81,7 +81,7 @@ Windows
   (env)> pip install ipykernel
   ...
   (env)> py -m ipykernel install --user --name=nutriscore
-  Installed kernelspec nutriscore in C:\Users\...\kernels\nutscore
+  Installed kernelspec nutriscore in C:\Users\...\kernels\nutriscore
 
 
 Télécharger les données
@@ -122,7 +122,7 @@ il suffit de lancer celui que vous désirez.
     le notebook 1.1-tg-fetch-images.ipynb télécharge une quantité conséquente
     de données (images) **100-200 Go** et peut donc mettre du temps...
     Voir **carrément bloquer** votre ordinateur... Vous êtes prévenu!
-    Il est donc déconseillé de lancer se dernier si ce n'est pas nécessaire.
+    Il est donc déconseillé de lancer ce dernier si ce n'est pas nécessaire.
 
 Lancer l'application de démo
 ------------------------------

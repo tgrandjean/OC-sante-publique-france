@@ -23,7 +23,7 @@ se trouvent alors dans le répertoire data/raw
     qu'Openfoodfacts or, le format est beaucoup plus lourd (10Go) et l'idée a
     été abandonnée.)
 
-    Pour recharcher la base de donnée d'Openfoodfacts dans une instance MongoDB,
+    Pour recharger la base de donnée d'Openfoodfacts dans une instance MongoDB,
     vous devez avoir docker installé (et démarré). Il suffit alors de modifier
     l'option --format (-f) dans le Makefile ou comme option si vous téléchargez
     les données en utilisant directement le script :ref:`make_dataset`

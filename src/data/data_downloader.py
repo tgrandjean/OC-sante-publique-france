@@ -21,8 +21,8 @@ class DataDownloader(object):
         >>> data_downloader.run()
 
     :args:
-        data_path (str, path like) : destination folder for downloaded files
-        frmt (str) : should be one of "csv" or "mongodb". Format of downloaded
+        * data_path (str, path like) : destination folder for downloaded files
+        * frmt (str) : should be one of "csv" or "mongodb". Format of downloaded
         file. Optional, default=csv
     """
 

@@ -4,7 +4,7 @@
 # external requirements
 Click==7.0
 Sphinx
-groundwork-sphinx-theme
+sphinx_rtd_theme
 coverage
 awscli
 flake8
