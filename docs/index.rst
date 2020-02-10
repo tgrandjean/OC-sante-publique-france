@@ -9,7 +9,7 @@ sante publique france documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    getting-started
    commands

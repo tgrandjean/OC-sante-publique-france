@@ -141,6 +141,23 @@ class SimpleParser(Parser):
 
     @classmethod
     def action(cls, match):
+        """action method, return value and unit of quantity.
+
+        This parsers should match simple quantity format.
+        By simple quantity format we mean something like 100g or 2x100g.
+        if the parser match, we expect a match of two or three groups and
+        NOTHING ELSE!
+
+            * Matches with two groups: we expect something like '100 g'
+            * Matches with three groups: we expect something like '2 x 100g'
+
+        .. note::
+            check the formats's regex (SimpleParser.formats) to see what will
+            match or not.
+
+        :args:
+            match (re.match): if the parser match, we get an input as re.match
+        """
         if len(match.groups()) == 2:
             # ex 100 g
             value = float(match.group(1).replace(',', '.'))

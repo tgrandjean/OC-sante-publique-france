@@ -1,3 +1,5 @@
+.. _make_dataset:
+
 source code documentation
 ===========================
 
@@ -16,6 +18,9 @@ src.demo_app
 
 .. automodule:: src.demo_app.demo
     :members:
+
+app_assets
+^^^^^^^^^^^
 
 .. automodule:: src.demo_app.app_assets
     :members:

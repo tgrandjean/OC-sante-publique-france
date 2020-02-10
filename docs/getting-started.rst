@@ -4,7 +4,7 @@ Getting started - Faire tourner le projet
 Cloner le projet
 ------------------
 
-La première chose à faire de cloner le répertoire de code.
+La première chose à faire est de cloner le répertoire de code.
 Ce dernier est disponible à l’adresse:
 
 https://github.com/tgrandjean/OC-sante-publique-france/
@@ -14,16 +14,30 @@ Avec git
 ::
 
  git clone https://github.com/tgrandjean/OC-sante-publique-france
+ cd OC-sante-publique-france
 
 Sans git
 ^^^^^^^^^
 
 Allez sur github, cliquez sur "Clone or download" et cliquez sur "download zip".
+Une fois l'archive décompressée, ouvrez un terminal (powershell sous windows ou
+shell sous linux/macOS) et placez vous dans le répertoire:
+::
 
+  cd ~\Téléchargements\OC-sante-publique-france
 
-Sous Linux
----------------
-Installez un environnement virtuel
+Pour la suite (sauf indication contraire), toute les commandes devront être
+lancées depuis le répertoire de base.
+
+Sous Linux - macOS (non testé)
+------------------------------
+Installez un environnement virtuel. Si vous n'avez pas virtualenv installé,
+consultez https://gist.github.com/Geoyi/d9fab4f609e9f75941946be45000632b
+
+.. note::
+  Le projet est prévu pour fonctionner sur python 3.5+, vérifiez bien que
+  toute les commandes sont lancées avec le bon interpréteur python !
+
 ::
 
   $ make create_environment
@@ -92,9 +106,10 @@ Une fois Jupyter lancé, vous devrez naviguer jusqu'au répertoire notebooks pui
 il suffit de lancer celui que vous désirez.
 
 .. note::
-    Seul les notebooks ayant un numéro type \*.0-tg-\*.ipynb sont nécessaires
+    Seul les notebooks ayant un numéro de version type X.0- (exemple 1.0-tg-XXX.ipynb ) sont nécessaires
+    pour générer les fichiers annexes.
 
-.. warning::
+.. note::
     Le traitement des données se fait séquentiellement, si vous essayez de lancer
     le notebook 3.0-tg-... avant le 2.0-tg-... vous allez rencontrer l'erreur
     FileNotFoundError ou OSError.
@@ -102,6 +117,7 @@ il suffit de lancer celui que vous désirez.
 .. warning::
     le notebook 1.1-tg-fetch-images.ipynb télécharge une quantité conséquente
     de données (images) **100-200 Go** et peut donc mettre du temps...
+    Voir **carrément bloquer** votre ordinateur... Vous êtes prévenu!
     Il est donc déconseillé de lancer se dernier si ce n'est pas nécessaire.
 
 Lancer l'application de démo
@@ -113,6 +129,6 @@ Lancer l'application de démo
 
 Une fois lancer l'application se lance lance dans le navigateur internet.
 
-.. warning::
+.. note::
     Les données nécessaires à l'application sont générées à la fin du notebook
     `2.0-tg-data-cleaning.ipynb`
