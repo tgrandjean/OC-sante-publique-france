@@ -69,6 +69,8 @@ Linux
 ^^^^^
 ::
 
+  (env)$ pip install ipykernel
+  ...
   (env)$ python -m ipykernel install --user --name=nutriscore
   Installed kernelspec nutriscore in /home/user/.local/share/jupyter/kernels/nutriscore
 
@@ -76,8 +78,10 @@ Windows
 ^^^^^^^^
 ::
 
-  (env)> pip install ipykernel --user --name=nutriscore
-  Installed kernelspec nutriscore in ...
+  (env)> pip install ipykernel
+  ...
+  (env)> py -m ipykernel install --user --name=nutriscore
+  Installed kernelspec nutriscore in C:\Users\...\kernels\nutscore
 
 
 Télécharger les données

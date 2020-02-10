@@ -3,6 +3,7 @@
 
 import logging
 import os
+from pathlib import Path
 import requests
 import subprocess
 import tarfile
@@ -33,7 +34,7 @@ class DataDownloader(object):
         logger.debug('Init DataDownloader object with arg : %s, %s, %s',
                      data_path, frmt, kwargs)
         self.data_format = frmt.lower()
-        self.data_path = os.path.join(data_path, 'raw')
+        self.data_path = Path(os.path.join(data_path, 'raw')).resolve()
         if self.data_format == 'csv':
             self.output_filepath = os.path.join(self.data_path, 'products.csv')
         elif self.data_format == 'mongodb':
@@ -59,9 +60,10 @@ class DataDownloader(object):
                      ]
         if not os.path.exists(self.data_path):
             logger.info('Creating directories.')
-            os.mkdir(self.data_path)
+            logger.debug(self.data_path)
+            os.mkdir(self.data_path.parents[0])
             for dir in data_dirs:
-                os.mkdir(os.path.join(self.data_path, dir))
+                os.mkdir(os.path.join(self.data_path.parents[0], dir))
         else:
             logger.info('Data directories already exists.')
 
