@@ -28,26 +28,34 @@ data = load_data(BASE_PATH.joinpath('data', 'processed',
 
 data = data[data['image_url'].notnull()]
 
-product = st.sidebar.selectbox(options=products, label='select a product')
-product_infos = data[data['code'] == product].iloc[0, :]
+st.sidebar.markdown("Select a product or enter a code product.")
+custom = st.sidebar.checkbox('Custom code', value=False, key=None)
+if custom:
+    product = st.sidebar.text_input('code produit :', value=products[0])
+else:
+    product = st.sidebar.selectbox(options=products, label='select a product')
 
-st.sidebar.markdown("**Produit :** " + product_infos['product_name'])
-n_prod = st.sidebar.number_input('Nombre maximum de produits à afficher.',
-                                 value=10)
+if product:
+    product_infos = data[data['code'] == product].iloc[0, :]
 
-display_product(product_infos.to_dict())
+    st.sidebar.markdown("**Produit :** " + product_infos['product_name'])
+    n_prod = st.sidebar.number_input('Nombre maximum de produits à afficher.',
+                                     value=10)
+
+    display_product(product_infos.to_dict())
 
 
-st.title('Résultats de la recherche')
-related_products = data[data['pnns_groups_2'] ==
-                        product_infos['pnns_groups_2']]
-related_products = related_products[related_products['main_category_en'] ==
-                                    product_infos.main_category_en]
+    st.title('Résultats de la recherche')
+    related_products = data[data['pnns_groups_2'] ==
+                            product_infos['pnns_groups_2']]
+    related_products = related_products[related_products['main_category_en'] ==
+                                        product_infos.main_category_en]
 
-related_products.sort_values('nutriscore_grade', ascending=True, inplace=True)
+    related_products.sort_values('nutriscore_grade', ascending=True,
+                                 inplace=True)
 
-st.info(f"Nombre de produits trouvés {related_products.shape[0]}")
+    st.info(f"Nombre de produits trouvés {related_products.shape[0]}")
 
-for i in range(n_prod):
-    product = related_products.iloc[i, :]
-    display_product(product.to_dict())
+    for i in range(n_prod):
+        product = related_products.iloc[i, :]
+        display_product(product.to_dict())
