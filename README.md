@@ -36,7 +36,7 @@ Project Organization
         ├── demo_app       <- Code for demo app using streamlit
         │   └── demo.py    <- `~ streamlit run ./src/demo_app/demo.py`
         │
-        └── visualization  <- Code contening wrappers for visualizations in notebooks
+        └── visualization  <- Code containing wrappers for visualizations in notebooks
             └── visualize.py
 
 Features
